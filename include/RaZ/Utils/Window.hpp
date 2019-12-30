@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <vector>
+#include <set>
 
 namespace Raz {
 
@@ -23,12 +24,22 @@ using MouseMoveCallback    = std::tuple<double, double, std::function<void(doubl
 using InputActions         = std::unordered_map<int, std::pair<std::function<void(float)>, Input::ActionTrigger>>;
 using InputCallbacks       = std::tuple<KeyboardCallbacks, MouseButtonCallbacks, MouseScrollCallback, MouseMoveCallback, InputActions>;
 
+class WindowObserver
+{
+public:
+  virtual void onFramebufResize(int32_t w, int32_t h) = 0;
+};
+
 /// Graphical window to render the scenes on, with input custom actions.
 class Window {
 public:
+  typedef std::set<WindowObserver*> WinObserverList;
   Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t antiAliasingSampleCount = 1);
   Window(const Window&) = delete;
   Window(Window&&) = default;
+
+  void registerObserver(WindowObserver* obs);
+  void unregisterObserver(WindowObserver* obs);
 
   unsigned int getWidth() const { return m_width; }
   unsigned int getHeight() const { return m_height; }
@@ -149,6 +160,9 @@ public:
   ~Window() { close(); }
 
 private:
+  void __onFramebufResize(int32_t width, int32_t height);
+
+private:
   unsigned int m_width {};
   unsigned int m_height {};
   Vec4f m_clearColor = Vec4f({ 0.15f, 0.15f, 0.15f, 1.f });
@@ -156,6 +170,8 @@ private:
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
   OverlayPtr m_overlay {};
+
+  WinObserverList   m_winObserverList;
 };
 
 } // namespace Raz

@@ -32,7 +32,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 #endif
 
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  glfwWindowHint(GLFW_RESIZABLE, false);
+  // glfwWindowHint(GLFW_RESIZABLE, false); //comment by xlm, i just want the window resizable
   glfwWindowHint(GLFW_SAMPLES, antiAliasingSampleCount);
 
 #if !defined(NDEBUG)
@@ -51,11 +51,27 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 
   glfwMakeContextCurrent(m_window);
 
+
   glViewport(0, 0, static_cast<int>(width), static_cast<int>(height));
 
   Renderer::initialize();
 
   glfwSetWindowUserPointer(m_window, this);
+  //added by xlm, set the resize call back
+  glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow *gl_win, int w, int h){
+    auto *win = reinterpret_cast<Window *>(glfwGetWindowUserPointer(gl_win));
+    if (win)
+    {
+      win->__onFramebufResize(w,h);
+    }
+  });
+  // glfwSetWindowSizeCallback(m_window, [](GLFWwindow *gl_win, int w, int h) {
+  //   auto *win = reinterpret_cast<Window *>(gl_win);
+  //   if (win)
+  //   {
+  //     win->__onResize(w, h);
+  //   }
+  // });
 
   enableFaceCulling();
   Renderer::enable(Capability::DEPTH_TEST);
@@ -300,6 +316,27 @@ void Window::close() {
   glfwTerminate();
 
   m_window = nullptr;
+}
+
+void Window::__onFramebufResize(int32_t width, int32_t height)
+{
+  auto it = m_winObserverList.begin();
+  while (it != m_winObserverList.end())
+  {
+    // WindowObserver* obs = reinterpret_cast< WindowObserver*>(*it);
+    (*it)->onFramebufResize(width, height);
+    ++it;
+  }
+}
+
+void Window::registerObserver(WindowObserver* obs)
+{
+  m_winObserverList.emplace(obs);
+}
+
+void Window::unregisterObserver(WindowObserver* obs)
+{
+  m_winObserverList.erase(obs);
 }
 
 } // namespace Raz
