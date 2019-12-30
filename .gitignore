@@ -33,3 +33,8 @@
 
 # CLion folder
 .idea/
+
+linux_build
+linux_install
+my_build.sh
+extern/fbx20190_fbxsdk_linux.tar.gz
