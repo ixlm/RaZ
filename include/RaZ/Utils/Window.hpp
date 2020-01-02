@@ -35,7 +35,7 @@ public:
 class Window {
 public:
   typedef std::set<WindowObserver*> WinObserverList;
-  typedef std::unordered_map<std::string, Overlay* > OverlayMap;
+  // typedef std::unordered_map<std::string, Overlay* > OverlayMap;
 
   Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t antiAliasingSampleCount = 1);
   Window(const Window&) = delete;
@@ -119,14 +119,22 @@ public:
 
   //----------------overlay begin--------------------------------------- 
   /// Enables the overlay.
-  Overlay* addOverlay(const std::string& name);
-  bool enableOverlay(const std::string& name); //
-  /// Disables the overlay.
-  bool disableOverlay(const std::string& name); //
-  bool removeOverlay(const std::string& name, bool deleteObj = true);
+  // Overlay* addOverlay(const std::string& name);
+  // bool enableOverlay(const std::string& name); //
+  // /// Disables the overlay.
+  // bool disableOverlay(const std::string& name); //
+  // bool removeOverlay(const std::string& name, bool deleteObj = true);
+  /**
+  @brief:xlm,
+  @param:  show the overlay if show=true else hide
+  @return:
+  */
+  void showOverlay(bool show = true);
+  void toggleOverlay();
+  Overlay* getOverlay();
 
-  Overlay* getOverlayByName(const std::string& name);
-  bool addOverlay(const std::string& name, Overlay* overlay);
+  // Overlay* getOverlayByName(const std::string& name);
+  // bool addOverlay(const std::string& name, Overlay* overlay);
 
   /// Adds a label on the overlay.
   /// \param label Text to be displayed.
@@ -173,6 +181,9 @@ public:
 
 private:
   void __onFramebufResize(int32_t width, int32_t height);
+  void __removeOverlay();
+
+  void __update_overlay(float deltaTime);
 
 
 private:
@@ -182,11 +193,13 @@ private:
 
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
-  // OverlayPtr m_overlay {};
+  
+  OverlayPtr m_overlay {};
 
   WinObserverList   m_winObserverList;
 
-  OverlayMap        m_overlays; // multiply overlay support
+  // OverlayMap        m_overlays; // multiply overlay support
+
 };
 
 } // namespace Raz

@@ -135,21 +135,38 @@ int main() {
 //   window.addOverlayButton("Load Lake skybox",   [&render] () { loadLakeSkybox(render); });
 //   window.addOverlaySeparator();
 //   window.addOverlayFpsCounter("FPS: %.1f");
-  auto* overlay = window.addOverlay("default");
+  // auto* overlay = window.addOverlay("default");
+  auto* overlay = window.getOverlay();
   // overlay->enableOverlay();
-  overlay->addButton("Load Sponza scene",   [&mesh, &render] () { loadSponzaScene(mesh, render); });
-  overlay->addButton("Load Ball scene",     [&mesh, &render] () { loadBallScene(mesh, render); });
-  overlay->addButton("Load Shield scene",   [&mesh, &render] () { loadShieldScene(mesh, render); });
-  overlay->addButton("Load Cerberus scene", [&mesh, &render] () { loadCerberusScene(mesh, render); });
+  // overlay->addButton("Load Sponza scene",   [&mesh, &render] () { loadSponzaScene(mesh, render); });
+  overlay->addOverlayElement<Raz::OverlayButton>("Load Sponza scene",   [&mesh, &render] () { loadSponzaScene(mesh, render); });
+  overlay->addNoNameOverlayElement<Raz::OverlaySameLine>();
+  
+  overlay->addOverlayElement<Raz::OverlayButton>("Load Ball scene",     [&mesh, &render] () { loadBallScene(mesh, render); });
+  overlay->addOverlayElement<Raz::OverlayButton>("Load Shield scene",   [&mesh, &render] () { loadShieldScene(mesh, render); });
+  overlay->addOverlayElement<Raz::OverlayButton>("Load Cerberus scene", [&mesh, &render] () { loadCerberusScene(mesh, render); });
 #if defined(FBX_ENABLED)
-  overlay->addButton("Load Shader ball scene", [&mesh, &render] () { loadShaderBallScene(mesh, render); });
+  overlay->addOverlayElement<Raz::OverlayButton>("Load Shader ball scene", [&mesh, &render] () { loadShaderBallScene(mesh, render); });
 #endif
-  overlay->addSeparator();
-  overlay->addButton("Remove skybox",      [&render] () { render.removeCubemap(); });
-  overlay->addButton("Load Clouds skybox", [&render] () { loadCloudsSkybox(render); });
-  overlay->addButton("Load Lake skybox",   [&render] () { loadLakeSkybox(render); });
-  overlay->addSeparator();
-  overlay->addFpsCounter("FPS: %.1f");
+  // overlay->addSeparator();
+  overlay->addNoNameOverlayElement<Raz::OverlaySeparator>();
+  overlay->addOverlayElement<Raz::OverlayButton>("Remove skybox",      [&render] () { render.removeCubemap(); });
+  overlay->addOverlayElement<Raz::OverlayButton>("Load Clouds skybox", [&render] () { loadCloudsSkybox(render); });
+  overlay->addOverlayElement<Raz::OverlayButton>("Load Lake skybox",   [&render] () { loadLakeSkybox(render); });
+  // overlay->addSeparator();
+  auto* frame_elem = overlay->addOverlayElement<Raz::OverlayFrame>("test", false, ImGuiWindowFlags_NoTitleBar);
+  frame_elem->addOverlayElement<Raz::OverlayLabel>("test1");
+  frame_elem->addOverlayElement<Raz::OverlayLabel>("test2");
+  frame_elem->addOverlayElement<Raz::OverlayLabel>("test3");
+  frame_elem->addNoNameOverlayElement<Raz::OverlaySameLine>();
+  frame_elem->addOverlayElement<Raz::OverlayLabel>("test4");
+
+  overlay->addNoNameOverlayElement<Raz::OverlaySeparator>();
+  overlay->addOverlayElement<Raz::OverlayFpsCounter>("FPS: %.1f");
+
+
+  // auto* other_overlay = window.addOverlay("other");
+  // other_overlay->addLabel("12333");
 
 
 

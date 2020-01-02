@@ -2,6 +2,11 @@ project(RaZ_Examples)
 
 set(CMAKE_CXX_STANDARD 17)
 
+include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../extern
+    )
+message (STATUS "-----------------------${CMAKE_CURRENT_SOURCE_DIR}------------------")
+
 add_executable(RaZ_FullDemo fullDemo.cpp)
 target_link_libraries(RaZ_FullDemo RaZ)
 

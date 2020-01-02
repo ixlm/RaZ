@@ -75,6 +75,8 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
 
   enableFaceCulling();
   Renderer::enable(Capability::DEPTH_TEST);
+
+  m_overlay = Overlay::create(m_window);
 }
 
 void Window::setTitle(const std::string& title) const {
@@ -231,60 +233,89 @@ void Window::updateCallbacks() const {
   }
 }
 
-Overlay* Window::addOverlay(const std::string& name)
+void Window::showOverlay(bool show )
 {
-  auto it = m_overlays.find(name);
-  if (it != m_overlays.end())
+  if (!m_overlay.get())
+    return;
+    // m_overlay = Overlay::create(m_window);
+  m_overlay->setStatus(show?Overlay::OverlayStatus::OS_ENABLED : Overlay::OverlayStatus::OS_DISABLED);
+}
+
+void Window::toggleOverlay()
+{
+  if (!m_overlay.get())
   {
-    return it->second;
+      return ;
+    // m_overlay = Overlay::create(m_window);
+    // m_overlay->setStatus(Overlay::OverlayStatus::OS_ENABLED);
   }
   else
   {
-    auto* overlay = Overlay::create(name, m_window);
-    m_overlays[name] = overlay;
-    return overlay;
+    auto show = (Overlay::OverlayStatus::OS_ENABLED == m_overlay->getStatus());
+    m_overlay->setStatus(show?Overlay::OverlayStatus::OS_ENABLED : Overlay::OverlayStatus::OS_DISABLED);
   }
-
 }
 
-bool  Window::enableOverlay(const std::string& name) 
-{ 
-  // m_overlay = Overlay::create(m_window); 
-  auto it = m_overlays.find(name);
-  if (it != m_overlays.end())
-  {
-    it->second->setStatus(Overlay::OverlayStatus::OS_ENABLED);
-    return true;
-  }
-  return false;
-}
-  /// Disables the overlay.
-bool Window::disableOverlay(const std::string& name) 
-{ 
-  // m_overlay.reset(); 
-  auto it = m_overlays.find(name);
-  if (it != m_overlays.end())
-  {
-    it->second->setStatus(Overlay::OverlayStatus::OS_DISABLED);
-    return true;
-    // return it->second;
-  }
-  return false;
-  
-}
-
-bool Window::removeOverlay(const std::string& name, bool deleteObj )
+Overlay* Window::getOverlay()
 {
-  auto it = m_overlays.find(name);
-  if (it != m_overlays.end())
-  {
-    if (deleteObj)
-      delete it->second;
-    m_overlays.erase(it);
-    return true;
-  }
-  return false;
+  return m_overlay.get();
 }
+
+
+// Overlay* Window::addOverlay(const std::string& name)
+// {
+//   auto it = m_overlays.find(name);
+//   if (it != m_overlays.end())
+//   {
+//     return it->second;
+//   }
+//   else
+//   {
+//     auto* overlay = Overlay::create(name, m_window);
+//     m_overlays[name] = overlay;
+//     return overlay;
+//   }
+
+// }
+
+// bool  Window::enableOverlay(const std::string& name) 
+// { 
+//   // m_overlay = Overlay::create(m_window); 
+//   auto it = m_overlays.find(name);
+//   if (it != m_overlays.end())
+//   {
+//     it->second->setStatus(Overlay::OverlayStatus::OS_ENABLED);
+//     return true;
+//   }
+//   return false;
+// }
+//   /// Disables the overlay.
+// bool Window::disableOverlay(const std::string& name) 
+// { 
+//   // m_overlay.reset(); 
+//   auto it = m_overlays.find(name);
+//   if (it != m_overlays.end())
+//   {
+//     it->second->setStatus(Overlay::OverlayStatus::OS_DISABLED);
+//     return true;
+//     // return it->second;
+//   }
+//   return false;
+  
+// }
+
+// bool Window::removeOverlay(const std::string& name, bool deleteObj )
+// {
+//   auto it = m_overlays.find(name);
+//   if (it != m_overlays.end())
+//   {
+//     if (deleteObj)
+//       delete it->second;
+//     m_overlays.erase(it);
+//     return true;
+//   }
+//   return false;
+// }
 
 // void Window::addOverlayLabel(std::string label) {
 //   m_overlay->addLabel(std::move(label));
@@ -314,69 +345,113 @@ bool Window::removeOverlay(const std::string& name, bool deleteObj )
 //   m_overlay->addFpsCounter(std::move(formattedLabel));
 // }
 
+void Window::__update_overlay(float deltaTime)
+{
+  if (!m_overlay || m_overlay->getStatus() == Overlay::OverlayStatus::OS_DISABLED)
+    return;
+
+  if ( !m_overlay->hasKeyboardFocus())
+  {
+    // Process actions belonging to pressed keys & mouse buttons
+    auto &actions = std::get<4>(m_callbacks);
+    auto actionIter = actions.begin();
+
+    while (actionIter != actions.end())
+    {
+      auto &action = actionIter->second;
+
+      // An action consists of two parts:
+      //   - a callback associated to the triggered key or button
+      //   - a value indicating if it should be executed only once or every
+      //   frame
+
+      action.first(deltaTime);
+
+      // Removing the current action if ONCE is given, or simply increment the
+      // iterator
+      if (action.second == Input::ONCE)
+        actionIter = actions.erase(
+            actionIter); // std::unordered_map::erase(iter) returns an iterator
+                         // on the next element
+      else
+        ++actionIter;
+    }
+  }
+  m_overlay->render();
+}
+
 bool Window::run(float deltaTime) {
   if (glfwWindowShouldClose(m_window))
     return false;
 
   glfwPollEvents();
+  __update_overlay(deltaTime);
 
-#if 0
-  // Input callbacks should not be executed if the overlay requested keyboard focus
-  if (!m_overlay || !m_overlay->hasKeyboardFocus()) {
-    // Process actions belonging to pressed keys & mouse buttons
-    auto& actions   = std::get<4>(m_callbacks);
-    auto actionIter = actions.begin();
+  // Input callbacks should not be executed if the overlay requested keyboard
+  // focus
+  // if (!m_overlay || !m_overlay->hasKeyboardFocus())
+  // {
+  //   // Process actions belonging to pressed keys & mouse buttons
+  //   auto &actions = std::get<4>(m_callbacks);
+  //   auto actionIter = actions.begin();
 
-    while (actionIter != actions.end()) {
-      auto& action = actionIter->second;
+  //   while (actionIter != actions.end())
+  //   {
+  //     auto &action = actionIter->second;
 
-      // An action consists of two parts:
-      //   - a callback associated to the triggered key or button
-      //   - a value indicating if it should be executed only once or every frame
+  //     // An action consists of two parts:
+  //     //   - a callback associated to the triggered key or button
+  //     //   - a value indicating if it should be executed only once or every
+  //     //   frame
 
-      action.first(deltaTime);
+  //     action.first(deltaTime);
 
-      // Removing the current action if ONCE is given, or simply increment the iterator
-      if (action.second == Input::ONCE)
-        actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
-      else
-        ++actionIter;
-    }
-  }
+  //     // Removing the current action if ONCE is given, or simply increment the
+  //     // iterator
+  //     if (action.second == Input::ONCE)
+  //       actionIter = actions.erase(
+  //           actionIter); // std::unordered_map::erase(iter) returns an iterator
+  //                        // on the next element
+  //     else
+  //       ++actionIter;
+  //   }
+  // }
 
-  if (m_overlay)
-    m_overlay->render();
-#endif 
-for (auto& item: m_overlays)
-{
-  auto* overlay = item.second;
-  if (overlay->getStatus() == Overlay::OverlayStatus::OS_DISABLED)
-  {
-    continue;
-  }
-  if (!overlay->hasKeyboardFocus())
-  {
-    auto& actions   = std::get<4>(m_callbacks);
-    auto actionIter = actions.begin();
+  // if (m_overlay)
+  //   m_overlay->render();
+  // for (auto& item: m_overlays)
+  // {
+  //   auto* overlay = item.second;
+  //   if (overlay->getStatus() == Overlay::OverlayStatus::OS_DISABLED)
+  //   {
+  //     continue;
+  //   }
+  //   if (!overlay->hasKeyboardFocus())
+  //   {
+  //     auto& actions   = std::get<4>(m_callbacks);
+  //     auto actionIter = actions.begin();
 
-    while (actionIter != actions.end()) {
-      auto& action = actionIter->second;
+  //     while (actionIter != actions.end()) {
+  //       auto& action = actionIter->second;
 
-      // An action consists of two parts:
-      //   - a callback associated to the triggered key or button
-      //   - a value indicating if it should be executed only once or every frame
+  //       // An action consists of two parts:
+  //       //   - a callback associated to the triggered key or button
+  //       //   - a value indicating if it should be executed only once or every
+  //       frame
 
-      action.first(deltaTime);
+  //       action.first(deltaTime);
 
-      // Removing the current action if ONCE is given, or simply increment the iterator
-      if (action.second == Input::ONCE)
-        actionIter = actions.erase(actionIter); // std::unordered_map::erase(iter) returns an iterator on the next element
-      else
-        ++actionIter;
-    }
-  }
-  overlay->render();
-}
+  //       // Removing the current action if ONCE is given, or simply increment
+  //       the iterator if (action.second == Input::ONCE)
+  //         actionIter = actions.erase(actionIter); //
+  //         std::unordered_map::erase(iter) returns an iterator on the next
+  //         element
+  //       else
+  //         ++actionIter;
+  //     }
+  //   }
+  //   overlay->render();
+  // }
 
   glfwSwapBuffers(m_window);
 
@@ -400,11 +475,13 @@ void Window::setShouldClose() const {
 
 void Window::close() {
   // disableOverlay();
-  for(auto& item: m_overlays)
-  {
-    delete item.second;
-  }
-  m_overlays.clear();
+  // for(auto& item: m_overlays)
+  // {
+  //   delete item.second;
+  // }
+  // m_overlays.clear();
+  // m_overlay.reset();
+  __removeOverlay();
 
   glfwTerminate();
 
@@ -432,19 +509,24 @@ void Window::unregisterObserver(WindowObserver* obs)
   m_winObserverList.erase(obs);
 }
 
-Overlay* Window::getOverlayByName(const std::string& name)
-{
-  auto it = m_overlays.find(name) ;
-  return it == m_overlays.end() ? nullptr : it->second;
+// Overlay* Window::getOverlayByName(const std::string& name)
+// {
+//   auto it = m_overlays.find(name) ;
+//   return it == m_overlays.end() ? nullptr : it->second;
   
-}
+// }
 
-bool Window::addOverlay(const std::string& name, Overlay* overlay)
+// bool Window::addOverlay(const std::string& name, Overlay* overlay)
+// {
+//   if (overlay->getName().compare(name) != 0)
+//     return false;
+//   m_overlays[name] = overlay;
+//   return true;
+// }
+
+void Window::__removeOverlay()
 {
-  if (overlay->getName().compare(name) != 0)
-    return false;
-  m_overlays[name] = overlay;
-  return true;
+  m_overlay.reset();
 }
 
 } // namespace Raz

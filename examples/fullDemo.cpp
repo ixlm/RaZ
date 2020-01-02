@@ -12,7 +12,8 @@ int main() {
 
   Raz::Window& window = renderSystem.getWindow();
 
-  auto overlay = window.addOverlay("default");
+  // auto overlay = window.addOverlay("default");
+  auto overlay = window.getOverlay();
   // window.enableOverlay();
   window.setIcon(RAZ_ROOT + "assets/icons/RaZ_logo_128.png"s);
 
@@ -160,19 +161,42 @@ int main() {
                         [&window] () { window.disableCursor(); });
 
   // Overlay features
-  overlay->addLabel("RaZ - Full demo");
-  overlay->addSeparator();
-  overlay->addCheckbox("Enable face culling",
+  // overlay->addLabel("RaZ - Full demo");
+  // overlay->addSeparator();
+  // overlay->addCheckbox("Enable face culling",
+  //                     [&window] () { window.enableFaceCulling(); },
+  //                     [&window] () { window.disableFaceCulling(); },
+  //                     true);
+  // overlay->addCheckbox("Enable vertical sync",
+  //                     [&window] () { window.enableVerticalSync(); },
+  //                     [&window] () { window.disableVerticalSync(); },
+  //                     window.recoverVerticalSyncState());
+  // overlay->addSeparator();
+  // overlay->addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+  // overlay->addFpsCounter("FPS: %.1f");
+
+  // overlay->addLabel("RaZ - Full demo");
+  overlay->addOverlayElement<Raz::OverlayLabel>("RaZ - Full demo");
+  // overlay->addSeparator();
+  overlay->addNoNameOverlayElement<Raz::OverlaySeparator>();
+  // overlay->addCheckbox("Enable face culling",
+  //                     [&window] () { window.enableFaceCulling(); },
+  //                     [&window] () { window.disableFaceCulling(); },
+  //                     true);
+  overlay->addOverlayElement<Raz::OverlayCheckbox>("Enable face culling",
                       [&window] () { window.enableFaceCulling(); },
                       [&window] () { window.disableFaceCulling(); },
                       true);
-  overlay->addCheckbox("Enable vertical sync",
+  overlay->addOverlayElement<Raz::OverlayCheckbox>("Enable vertical sync",
                       [&window] () { window.enableVerticalSync(); },
                       [&window] () { window.disableVerticalSync(); },
                       window.recoverVerticalSyncState());
-  overlay->addSeparator();
-  overlay->addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
-  overlay->addFpsCounter("FPS: %.1f");
+  overlay->addNoNameOverlayElement<Raz::OverlaySeparator>();
+  // overlay->addSeparator();
+  // overlay->addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+  overlay->addOverlayElement<Raz::OverlayFrameTime>("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+  // overlay->addFpsCounter("FPS: %.1f");
+  overlay->addOverlayElement<Raz::OverlayFpsCounter>("FPS: %.1f");
 
   while (app.run());
 

@@ -294,7 +294,11 @@ endif ()
 
 target_sources(RaZ PRIVATE ${RAZ_FILES})
 
-target_include_directories(RaZ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# target_include_directories(RaZ PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(RaZ 
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    # PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui"
+    )
 
 # OpenGL version
 option(RAZ_USE_GL4 "Use OpenGL 4" OFF)
