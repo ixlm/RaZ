@@ -47,6 +47,8 @@
 #include "Utils/TypeUtils.hpp"
 #include "Utils/Window.hpp"
 
+//added by xlm
+#include "Math/MathFunc.hpp"
 using namespace Raz::Literals;
 
 #endif // RAZ_RAZ_HPP

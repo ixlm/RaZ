@@ -11,7 +11,9 @@ int main() {
                                   Raz::FragmentShader(RAZ_ROOT + "shaders/cook-torrance.glsl"s));
 
   Raz::Window& window = renderSystem.getWindow();
-  window.enableOverlay();
+
+  auto overlay = window.addOverlay("default");
+  // window.enableOverlay();
   window.setIcon(RAZ_ROOT + "assets/icons/RaZ_logo_128.png"s);
 
   Raz::Entity& camera = renderSystem.getCameraEntity();
@@ -144,7 +146,6 @@ int main() {
     cameraComp.setFieldOfView(Raz::Degreesf(std::max(15.f,
                                             std::min(90.f, (Raz::Degreesf(cameraComp.getFieldOfView()) + static_cast<float>(-yOffset) * 2.f).value))));
   });
-
   window.addMouseMoveCallback([&cameraTrans, &window] (double xMove, double yMove) {
     // Dividing move by window size to scale between -1 and 1
     cameraTrans.rotate(90.0_deg * static_cast<float>(yMove) / window.getHeight(),
@@ -152,26 +153,26 @@ int main() {
                        0.0_deg);
   });
 
-  window.disableCursor(); // Disabling mouse cursor to allow continuous rotations
+  window.disableCursor(); // Disabling mouse cursor to allow continuous rotationcameraTranss
   window.addKeyCallback(Raz::Keyboard::LEFT_ALT,
                         [&window] (float /* deltaTime */) { window.showCursor(); },
                         Raz::Input::ONCE,
                         [&window] () { window.disableCursor(); });
 
   // Overlay features
-  window.addOverlayLabel("RaZ - Full demo");
-  window.addOverlaySeparator();
-  window.addOverlayCheckbox("Enable face culling",
-                            [&window] () { window.enableFaceCulling(); },
-                            [&window] () { window.disableFaceCulling(); },
-                            true);
-  window.addOverlayCheckbox("Enable vertical sync",
-                            [&window] () { window.enableVerticalSync(); },
-                            [&window] () { window.disableVerticalSync(); },
-                            window.recoverVerticalSyncState());
-  window.addOverlaySeparator();
-  window.addOverlayFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
-  window.addOverlayFpsCounter("FPS: %.1f");
+  overlay->addLabel("RaZ - Full demo");
+  overlay->addSeparator();
+  overlay->addCheckbox("Enable face culling",
+                      [&window] () { window.enableFaceCulling(); },
+                      [&window] () { window.disableFaceCulling(); },
+                      true);
+  overlay->addCheckbox("Enable vertical sync",
+                      [&window] () { window.enableVerticalSync(); },
+                      [&window] () { window.disableVerticalSync(); },
+                      window.recoverVerticalSyncState());
+  overlay->addSeparator();
+  overlay->addFrameTime("Frame time: %.3f ms/frame"); // Frame time's & FPS counter's texts must be formatted
+  overlay->addFpsCounter("FPS: %.1f");
 
   while (app.run());
 

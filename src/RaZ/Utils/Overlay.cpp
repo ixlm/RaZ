@@ -6,7 +6,18 @@
 
 namespace Raz {
 
-Overlay::Overlay(GLFWwindow* window) {
+// Overlay::Overlay(GLFWwindow* window) {
+//   IMGUI_CHECKVERSION();
+
+//   ImGui::CreateContext();
+//   ImGui::StyleColorsDark();
+
+//   ImGui_ImplGlfw_InitForOpenGL(window, true);
+//   ImGui_ImplOpenGL3_Init("#version 330 core");
+// }
+
+Overlay::Overlay(const std::string& name, GLFWwindow* window ) : m_name(name), m_status(Overlay::OverlayStatus::OS_ENABLED)
+{
   IMGUI_CHECKVERSION();
 
   ImGui::CreateContext();
@@ -15,6 +26,23 @@ Overlay::Overlay(GLFWwindow* window) {
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 330 core");
 }
+
+// void Overlay::setName(const std::string& name)
+// {
+//   m_name = name;
+// }
+std::string& Overlay::getName()
+{
+  return m_name;
+}
+
+/**
+@brief:xlm, get the overlay status,
+@param:
+@return: 1 enabled, 2 disabled
+*/
+Overlay::OverlayStatus Overlay::getStatus() { return m_status; }
+void Overlay::setStatus(Overlay::OverlayStatus status) { m_status = status; }
 
 void Overlay::addLabel(std::string label) {
   m_elements.emplace_back(OverlayLabel::create(std::move(label)));

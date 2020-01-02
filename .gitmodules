@@ -1,0 +1,3 @@
+[submodule "extern/ImGuizmo"]
+	path = extern/ImGuizmo
+	url = https://github.com/ixlm/ImGuizmo.git

@@ -121,20 +121,37 @@ int main() {
 
   loadBallScene(mesh, render);
 
-  window.enableOverlay();
-  window.addOverlayButton("Load Sponza scene",   [&mesh, &render] () { loadSponzaScene(mesh, render); });
-  window.addOverlayButton("Load Ball scene",     [&mesh, &render] () { loadBallScene(mesh, render); });
-  window.addOverlayButton("Load Shield scene",   [&mesh, &render] () { loadShieldScene(mesh, render); });
-  window.addOverlayButton("Load Cerberus scene", [&mesh, &render] () { loadCerberusScene(mesh, render); });
+//   window.enableOverlay();
+//   window.addOverlayButton("Load Sponza scene",   [&mesh, &render] () { loadSponzaScene(mesh, render); });
+//   window.addOverlayButton("Load Ball scene",     [&mesh, &render] () { loadBallScene(mesh, render); });
+//   window.addOverlayButton("Load Shield scene",   [&mesh, &render] () { loadShieldScene(mesh, render); });
+//   window.addOverlayButton("Load Cerberus scene", [&mesh, &render] () { loadCerberusScene(mesh, render); });
+// #if defined(FBX_ENABLED)
+//   window.addOverlayButton("Load Shader ball scene", [&mesh, &render] () { loadShaderBallScene(mesh, render); });
+// #endif
+//   window.addOverlaySeparator();
+//   window.addOverlayButton("Remove skybox",      [&render] () { render.removeCubemap(); });
+//   window.addOverlayButton("Load Clouds skybox", [&render] () { loadCloudsSkybox(render); });
+//   window.addOverlayButton("Load Lake skybox",   [&render] () { loadLakeSkybox(render); });
+//   window.addOverlaySeparator();
+//   window.addOverlayFpsCounter("FPS: %.1f");
+  auto* overlay = window.addOverlay("default");
+  // overlay->enableOverlay();
+  overlay->addButton("Load Sponza scene",   [&mesh, &render] () { loadSponzaScene(mesh, render); });
+  overlay->addButton("Load Ball scene",     [&mesh, &render] () { loadBallScene(mesh, render); });
+  overlay->addButton("Load Shield scene",   [&mesh, &render] () { loadShieldScene(mesh, render); });
+  overlay->addButton("Load Cerberus scene", [&mesh, &render] () { loadCerberusScene(mesh, render); });
 #if defined(FBX_ENABLED)
-  window.addOverlayButton("Load Shader ball scene", [&mesh, &render] () { loadShaderBallScene(mesh, render); });
+  overlay->addButton("Load Shader ball scene", [&mesh, &render] () { loadShaderBallScene(mesh, render); });
 #endif
-  window.addOverlaySeparator();
-  window.addOverlayButton("Remove skybox",      [&render] () { render.removeCubemap(); });
-  window.addOverlayButton("Load Clouds skybox", [&render] () { loadCloudsSkybox(render); });
-  window.addOverlayButton("Load Lake skybox",   [&render] () { loadLakeSkybox(render); });
-  window.addOverlaySeparator();
-  window.addOverlayFpsCounter("FPS: %.1f");
+  overlay->addSeparator();
+  overlay->addButton("Remove skybox",      [&render] () { render.removeCubemap(); });
+  overlay->addButton("Load Clouds skybox", [&render] () { loadCloudsSkybox(render); });
+  overlay->addButton("Load Lake skybox",   [&render] () { loadLakeSkybox(render); });
+  overlay->addSeparator();
+  overlay->addFpsCounter("FPS: %.1f");
+
+
 
   window.addKeyCallback(Raz::Keyboard::ESCAPE, [&app] (float /* deltaTime */) { app.quit(); });
   window.addMouseScrollCallback([&cameraTrans] (double /* xOffset */, double yOffset) {

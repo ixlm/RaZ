@@ -11,6 +11,7 @@
 #include <functional>
 #include <vector>
 #include <set>
+#include <unordered_map>
 
 namespace Raz {
 
@@ -34,6 +35,8 @@ public:
 class Window {
 public:
   typedef std::set<WindowObserver*> WinObserverList;
+  typedef std::unordered_map<std::string, Overlay* > OverlayMap;
+
   Window(unsigned int width, unsigned int height, const std::string& title = "", uint8_t antiAliasingSampleCount = 1);
   Window(const Window&) = delete;
   Window(Window&&) = default;
@@ -113,35 +116,43 @@ public:
   void addMouseMoveCallback(std::function<void(double, double)> func);
   /// Associates all of the callbacks, making them active.
   void updateCallbacks() const;
+
+  //----------------overlay begin--------------------------------------- 
   /// Enables the overlay.
-  void enableOverlay() { m_overlay = Overlay::create(m_window); }
+  Overlay* addOverlay(const std::string& name);
+  bool enableOverlay(const std::string& name); //
   /// Disables the overlay.
-  void disableOverlay() { m_overlay.reset(); }
+  bool disableOverlay(const std::string& name); //
+  bool removeOverlay(const std::string& name, bool deleteObj = true);
+
+  Overlay* getOverlayByName(const std::string& name);
+  bool addOverlay(const std::string& name, Overlay* overlay);
+
   /// Adds a label on the overlay.
   /// \param label Text to be displayed.
-  void addOverlayLabel(std::string label);
-  /// Adds a button on the overlay.
-  /// \param label Text to be displayed beside the button.
-  /// \param action Action to be executed when clicked.
-  void addOverlayButton(std::string label, std::function<void()> action);
-  /// Adds a checkbox on the overlay.
-  /// \param label Text to be displayed beside the checkbox.
-  /// \param actionOn Action to be executed when toggled on.
-  /// \param actionOff Action to be executed when toggled off.
-  /// \param initVal Initial value, checked or not.
-  void addOverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
-  /// Adds a texbox on the overlay.
-  /// \param label Text to be displayed beside the checkbox.
-  /// \param callback Function to be called every time the content is modified.
-  void addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback);
-  /// Adds an horizontal separator on the overlay.
-  void addOverlaySeparator();
-  /// Adds a frame time display on the overlay.
-  /// \param formattedLabel Text with a formatting placeholder to display the frame time (%.Xf, X being the precision after the comma).
-  void addOverlayFrameTime(std::string formattedLabel);
-  /// Adds a FPS (frames per second) counter on the overlay.
-  /// \param formattedLabel Text with a formatting placeholder to display the FPS (%.Xf, X being the precision after the comma).
-  void addOverlayFpsCounter(std::string formattedLabel);
+  // void addOverlayLabel(std::string label);
+  // /// Adds a button on the overlay.
+  // /// \param label Text to be displayed beside the button.
+  // /// \param action Action to be executed when clicked.
+  // void addOverlayButton(std::string label, std::function<void()> action);
+  // /// Adds a checkbox on the overlay.
+  // /// \param label Text to be displayed beside the checkbox.
+  // /// \param actionOn Action to be executed when toggled on.
+  // /// \param actionOff Action to be executed when toggled off.
+  // /// \param initVal Initial value, checked or not.
+  // void addOverlayCheckbox(std::string label, std::function<void()> actionOn, std::function<void()> actionOff, bool initVal);
+  // /// Adds a texbox on the overlay.
+  // /// \param label Text to be displayed beside the checkbox.
+  // /// \param callback Function to be called every time the content is modified.
+  // void addOverlayTextbox(std::string label, std::function<void(const std::string&)> callback);
+  // /// Adds an horizontal separator on the overlay.
+  // void addOverlaySeparator();
+  // /// Adds a frame time display on the overlay.
+  // /// \param formattedLabel Text with a formatting placeholder to display the frame time (%.Xf, X being the precision after the comma).
+  // void addOverlayFrameTime(std::string formattedLabel);
+  // /// Adds a FPS (frames per second) counter on the overlay.
+  // /// \param formattedLabel Text with a formatting placeholder to display the FPS (%.Xf, X being the precision after the comma).
+  // void addOverlayFpsCounter(std::string formattedLabel);
   /// Runs the window, refreshing its state by displaying the rendered scene, drawing the overlay, etc.
   /// \param deltaTime Amount of time elapsed since the last frame.
   /// \return True if the window hasn't been required to close, false otherwise.
@@ -159,8 +170,10 @@ public:
 
   ~Window() { close(); }
 
+
 private:
   void __onFramebufResize(int32_t width, int32_t height);
+
 
 private:
   unsigned int m_width {};
@@ -169,9 +182,11 @@ private:
 
   GLFWwindow* m_window {};
   InputCallbacks m_callbacks {};
-  OverlayPtr m_overlay {};
+  // OverlayPtr m_overlay {};
 
   WinObserverList   m_winObserverList;
+
+  OverlayMap        m_overlays; // multiply overlay support
 };
 
 } // namespace Raz

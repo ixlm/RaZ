@@ -29,10 +29,39 @@ enum class OverlayElementType {
 
 class Overlay {
 public:
-  explicit Overlay(GLFWwindow* window);
+  enum OverlayStatus
+  {
+    OS_ENABLED = 1,
+    OS_DISABLED,
+  };
+  // explicit Overlay(GLFWwindow* window);
+  explicit Overlay(const std::string& name, GLFWwindow* window );
 
+  // template <typename... Args>
+  // static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
   template <typename... Args>
-  static OverlayPtr create(Args&&... args) { return std::make_unique<Overlay>(std::forward<Args>(args)...); }
+  static Overlay* create(Args&&... args) 
+  { 
+    // return std::make_unique<Overlay>(std::forward<Args>(args)...); 
+    return new Overlay(std::forward<Args>(args)...);
+  }
+
+  // template <typename... Args>
+  // static Overlay* create(const std::string& name, Args&&... args) 
+  // { 
+  //   // return std::make_unique<Overlay>(std::forward<Args>(args)...); 
+  //   return new Overlay(name, std::forward<Args>(args)...);
+  // }
+
+  // void setName(const std::string& name);
+  std::string& getName();
+  /**
+  @brief:xlm, get the overlay status,
+  @param: 
+  @return: 1 enabled, 2 disabled
+  */
+  OverlayStatus getStatus();
+  void setStatus(OverlayStatus status );
 
   void addLabel(std::string label);
   void addButton(std::string label, std::function<void()> actionClick);
@@ -176,6 +205,9 @@ private:
   };
 
   std::vector<OverlayElementPtr> m_elements;
+  //added by xlm
+  std::string   m_name; //the name of overlay, we can get it by name
+  OverlayStatus       m_status; //
 };
 
 } // namespace Raz
