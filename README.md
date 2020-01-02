@@ -62,5 +62,9 @@ More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples
 To be honest, keeping it as a "simple" 3D engine was what I expected, but I wouldn't say no to working on another features aside from the rendering. Thus, it is not excluded _at all_ to evolve into a game engine, when I'll have more time.
 
 ## donate<br>
-![wechatpay](https://github.com/ixlm/RaZ/blob/master/donate/weichatpay.jpg)<br>
-![alipy](https://github.com/ixlm/RaZ/blob/master/donate/alipay.jpg)
+
+<h1 align="center">
+    <img alt="alipay" src="https://github.com/ixlm/RaZ/blob/master/donate/alipay.jpg" alt="Sample" width="250" height="250"/>
+    <br>
+    <img alt="alipay" src="https://github.com/ixlm/RaZ/blob/master/donate/weichatpay.jpg" alt="Sample" width="250" height="250"/>
+</h1>
