@@ -63,7 +63,7 @@ To be honest, keeping it as a "simple" 3D engine was what I expected, but I woul
 
 ## donate<br>
 
-<h1 align="center">
+<h1 align="left">
     <img alt="alipay" src="https://github.com/ixlm/RaZ/blob/master/donate/alipay.jpg" alt="Sample" width="250" height="250"/>
     <br>
     <img alt="alipay" src="https://github.com/ixlm/RaZ/blob/master/donate/weichatpay.jpg" alt="Sample" width="250" height="250"/>
