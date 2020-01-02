@@ -263,4 +263,17 @@ Overlay::~Overlay() {
   ImGui::DestroyContext();
 }
 
+  /**
+  @brief:xlm, as the seperator(sameline) element has no name, so can not get it by this function
+  @param: 
+  @return:
+  */
+OverlayElement* Overlay::getOverlayElementByName(const std::string& name)
+{
+  auto it = m_elements.find(name);
+  if (it != m_elements.end())
+    return it->second;
+  return nullptr;
+}
+
 } // namespace Raz

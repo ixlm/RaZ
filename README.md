@@ -1,3 +1,4 @@
+# thanks for Razarhel's great work! the Raz is really a cool project, maybe Razarhel is so busy to maintain the project(not update for long time), but i really like it, so i fork it and plan to make it continued updated in my parttime! welcome to join me!  so appreciated for donating to continue the work! 
 <h1 align="center">
     <img alt="RaZ logo" src="https://i.imgur.com/rwGGcpr.png" />
     <br />
@@ -59,3 +60,6 @@ More examples are available [here](https://github.com/Razakhel/RaZ/wiki/Examples
 ## In the future...
 
 To be honest, keeping it as a "simple" 3D engine was what I expected, but I wouldn't say no to working on another features aside from the rendering. Thus, it is not excluded _at all_ to evolve into a game engine, when I'll have more time.
+
+##donate
+
