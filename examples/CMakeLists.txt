@@ -8,13 +8,15 @@ include_directories(
 message (STATUS "-----------------------${CMAKE_CURRENT_SOURCE_DIR}------------------")
 
 add_executable(RaZ_FullDemo fullDemo.cpp)
-target_link_libraries(RaZ_FullDemo RaZ)
+target_link_libraries(RaZ_FullDemo RaZ spdlog)
 
 add_executable(RaZ_MinDemo minDemo.cpp)
-target_link_libraries(RaZ_MinDemo RaZ)
+target_link_libraries(RaZ_MinDemo RaZ spdlog)
 
 add_executable(RaZ_ShowcaseDemo showcaseDemo.cpp)
-target_link_libraries(RaZ_ShowcaseDemo RaZ)
+target_link_libraries(RaZ_ShowcaseDemo RaZ spdlog)
+
+
 
 # If FBX SDK used with MSVC, copy the DLL into the examples/ folder to link it properly
 if (MSVC AND RAZ_USE_FBX AND FBX_FOUND)

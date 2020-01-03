@@ -339,6 +339,10 @@ endif ()
 if (RAZ_USE_IMGUI)
     target_link_libraries(RaZ PRIVATE ImGui)
 endif ()
+# added by xlm
+if (RAZ_USE_SPDLOG)
+    target_link_libraries(RaZ PRIVATE spdlog)
+endif()
 
 # Build the examples
 option(RAZ_BUILD_EXAMPLES "Build examples" ON)

@@ -1,4 +1,6 @@
 #include "RaZ/RaZ.hpp"
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/basic_file_sink.h"
 
 using namespace std::literals;
 
@@ -100,7 +102,7 @@ inline void loadLakeSkybox(Raz::RenderSystem& render) {
 int main() {
   Raz::Application app;
   Raz::World& world = app.addWorld(Raz::World(1));
-
+  spdlog::info("----programe start-------");
   auto& render = world.addSystem<Raz::RenderSystem>(1280, 720, "RaZ - Showcase");
 
   Raz::Window& window = render.getWindow();
