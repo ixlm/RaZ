@@ -298,6 +298,7 @@ target_sources(RaZ PRIVATE ${RAZ_FILES})
 target_include_directories(RaZ 
     PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include"
     # PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/extern/imgui"
+    PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/extern/rapidjson/include/rapidjson"
     )
 
 # OpenGL version
