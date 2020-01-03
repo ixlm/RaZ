@@ -77,6 +77,7 @@ Window::Window(unsigned int width, unsigned int height, const std::string& title
   Renderer::enable(Capability::DEPTH_TEST);
 
   m_overlay = Overlay::create(m_window);
+  __registerBuiltinOverlayElements();
 }
 
 void Window::setTitle(const std::string& title) const {
@@ -529,4 +530,19 @@ void Window::__removeOverlay()
   m_overlay.reset();
 }
 
+void Window::__registerBuiltinOverlayElements()
+{
+  OverlayLabel::registerRender();
+  OverlayButton::registerRender();
+  OverlayCheckbox::registerRender();
+  OverlayTextbox::registerRender();
+  OverlaySeparator::registerRender();
+  OverlayFrame::registerRender();
+  OverlayChildFrame::registerRender();
+  OverlaySameLine::registerRender();
+  OverlayFpsCounter::registerRender();
+  OverlayFrameTime::registerRender();
+}
+
 } // namespace Raz
+
