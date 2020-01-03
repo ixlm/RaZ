@@ -12,50 +12,31 @@ namespace Raz
 {
 
 uint64_t g_no_name_element_seq = time(NULL);
-std::unordered_map<uint32_t, OverlayRenderer > g_element_render_map;
 
-void registerOverlayRender(OverlayElementType type, OverlayRenderer renderer)
+void OverlayLabel::render()
 {
-  g_element_render_map[(uint32_t)type] = [renderer](OverlayElement* elem) { renderer(elem);};
+ ImGui::TextUnformatted(m_label.c_str());
 }
 
-void unregisterOverlayRender(OverlayElementType type)
+void OverlayButton::render()
 {
-  auto it = g_element_render_map.find((uint32_t)type);
-  if (it != g_element_render_map.end())
-    g_element_render_map.erase(it);
-}
-
-void OverlayLabel::registerRender()
-{
-  registerOverlayRender(OverlayElementType::LABEL, [](OverlayElement *elem) {
-    ImGui::TextUnformatted(elem->getName().c_str());
-  });
-}
-
-void OverlayButton::registerRender()
-{
-  registerOverlayRender(OverlayElementType::BUTTON, [](OverlayElement *elem) {
-    OverlayButton *btn = dynamic_cast<OverlayButton *>(elem);
-    if (ImGui::Button(btn->getName().c_str()))
+    if (ImGui::Button(m_label.c_str()))
     {
-      btn->m_actionClick();
+      m_actionClick();
     }
-  });
 }
 
-void OverlayCheckbox::registerRender()
+
+void OverlayCheckbox::render()
 {
-  registerOverlayRender(OverlayElementType::CHECKBOX, [](OverlayElement *elem) {
-    auto* checkbox = dynamic_cast<OverlayCheckbox*>(elem);
-    const bool pre_val = checkbox->m_isChecked;
-    ImGui::Checkbox(checkbox->m_label.c_str(), &checkbox->m_isChecked);
-    if (checkbox->m_isChecked != pre_val)
-      checkbox->m_isChecked ? checkbox->m_actionOn() : checkbox->m_actionOff();
-  });
+  auto pre_val = m_isChecked;
+  ImGui::Checkbox(m_label.c_str(), &m_isChecked);
+  if (m_isChecked != pre_val)
+    m_isChecked ? m_actionOn() : m_actionOff();
 }
 
-void OverlayTextbox::registerRender()
+
+void OverlayTextbox::render()
 {
   static auto callback = [](ImGuiTextEditCallbackData* data)
   {
@@ -65,65 +46,34 @@ void OverlayTextbox::registerRender()
       textbox->m_callback(textbox->m_text);
     return 0;
   };
-  registerOverlayRender(OverlayElementType::TEXTBOX, [](OverlayElement *elem) {
-    auto* textbox = dynamic_cast<OverlayTextbox*>(elem);
-    ImGui::InputText(textbox->getName().c_str(), textbox->m_text.data()
-                      , textbox->m_text.capacity()
+  ImGui::InputText(m_label.c_str(), m_text.data()
+                      , m_text.capacity()
                       , ImGuiInputTextFlags_CallbackCharFilter, 
                       nullptr
-                      ,textbox);
-  });
+                      ,this);
 
 }
 
-void OverlaySeparator::registerRender()
+void OverlaySeparator::render()
 {
-  registerOverlayRender(OverlayElementType::SEPARATOR, [](OverlayElement *elem) {
-    ImGui::Separator();
-  });
+  ImGui::Separator();
 }
 
-void OverlayFrameTime::registerRender()
+void OverlayFrameTime::render()
 {
-  registerOverlayRender(OverlayElementType::FRAME_TIME, [](OverlayElement *elem) {
-    // auto* frame = dynamic_cast<OverlayFrameTime*>(elem);
-    ImGui::Text(elem->getName().c_str(), 1000.0f/ImGui::GetIO().Framerate );
-  });
+ ImGui::Text(m_label.c_str(), 1000.0f/ImGui::GetIO().Framerate );
 }
 
-void OverlayFpsCounter::registerRender()
+void OverlayFpsCounter::render()
 {
-  registerOverlayRender(OverlayElementType::FPS_COUNTER, [](OverlayElement *elem) {
-    // auto* frame = dynamic_cast<OverlayFrameTime*>(elem);
-    ImGui::Text(elem->getName().c_str(), ImGui::GetIO().Framerate );
-  });
+  ImGui::Text(m_label.c_str(), ImGui::GetIO().Framerate );
 
 }
 
-void OverlaySameLine::registerRender()
+void OverlaySameLine::render()
 {
-  registerOverlayRender(OverlayElementType::SAMELINE, [](OverlayElement *elem) {
     ImGui::SameLine();
-  });
 }
-
-void OverlayChildFrame::registerRender()
-{
-  registerOverlayRender(OverlayElementType::CHILD_FRAME, [](OverlayElement *elem) {
-    auto* frame = dynamic_cast<OverlayChildFrame*>(elem);
-    frame->render();
-  });
-}
-void OverlayFrame::registerRender()
-{
-  registerOverlayRender(OverlayElementType::FRAME, [](OverlayElement *elem) {
-    auto* frame = dynamic_cast<OverlayFrame*>(elem);
-    frame->render();
-  });
-}
-
-// registerOverlayRender(OverlayElementType::LABEL, )
-
 
 void OverlayFrame::render()
 {
@@ -133,14 +83,7 @@ void OverlayFrame::render()
   for (auto &item : m_elements)
   {
     auto *element = item.second;
-
-    auto it = g_element_render_map.find((uint32_t)element->getType());
-    if (it != g_element_render_map.end())
-    {
-      it->second(element);
-    }
-    
-
+    element->render();
   }
   ImGui::End();
 }
@@ -151,13 +94,7 @@ void OverlayChildFrame::render()
   for (auto &item : m_elements)
   {
     auto *element = item.second;
-
-    auto it = g_element_render_map.find((uint32_t)element->getType());
-    if (it != g_element_render_map.end())
-    {
-      it->second(element);
-    }
-
+    element->render();
   }
   ImGui::EndChild();
 }
@@ -197,12 +134,13 @@ void Overlay::render()
   for (auto &item : m_elements)
   {
     auto *element = item.second;
+    element->render();
     
-    auto it = g_element_render_map.find((uint32_t)element->getType());
-    if (it != g_element_render_map.end())
-    {
-      it->second(element);
-    }
+    // auto it = g_element_render_map.find((uint32_t)element->getType());
+    // if (it != g_element_render_map.end())
+    // {
+    //   it->second(element);
+    // }
   }
 
   ImGui::Render();

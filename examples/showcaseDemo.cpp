@@ -163,6 +163,18 @@ int main() {
 
   overlay->addNoNameOverlayElement<Raz::OverlaySeparator>();
   overlay->addOverlayElement<Raz::OverlayFpsCounter>("FPS: %.1f");
+  // std::pair<int, const char* >  item_vec[] = {
+  //   {1, "111"},
+  //   {2, "2"},
+  //   {3, "3"},
+  //   {4, "4"}
+  // };
+  std::vector< std::pair<int, const char* > > item_vec;
+  item_vec.push_back({1, "111"});
+  item_vec.push_back({2, "222"});
+  item_vec.push_back({3, "333"});
+  item_vec.push_back({4, "444"});
+  overlay->addOverlayElement<Raz::OverlayCombobox<int> >("combobox", 0, item_vec);
 
 
   // auto* other_overlay = window.addOverlay("other");

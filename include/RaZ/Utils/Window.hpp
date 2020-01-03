@@ -184,7 +184,7 @@ private:
   void __removeOverlay();
 
   void __update_overlay(float deltaTime);
-  void __registerBuiltinOverlayElements();
+  // void __registerBuiltinOverlayElements();
 
 
 private:

@@ -37,6 +37,7 @@ enum class OverlayElementType
   FRAME,
   SAMELINE,
   CHILD_FRAME,
+  COMBOBOX,
 };
 
 class OverlayElement;
@@ -50,11 +51,13 @@ class OverlayFpsCounter;
 class OverlayFrame;
 class OverlaySameLine;
 class OverlayChildFrame;
+template <typename T>
+class OverlayCombobox;
 
 
-typedef std::function<void(OverlayElement*)> OverlayRenderer;
-void registerOverlayRender(OverlayElementType type, OverlayRenderer renderer);
-void unregisterOverlayRender(OverlayElementType type);
+// typedef std::function<void(OverlayElement*)> OverlayRenderer;
+// void registerOverlayRender(OverlayElementType type, OverlayRenderer renderer);
+// void unregisterOverlayRender(OverlayElementType type);
 
 class OverlayElement
 {
@@ -67,10 +70,11 @@ public:
   }
 
   virtual OverlayElementType getType() const = 0;
-  static void registerRender();
+  // static void registerRender();
 
   virtual ~OverlayElement() = default;
   virtual const std::string &getName() const { return m_label; }
+  virtual void render() = 0;
 
 protected:
   std::string m_label{};
@@ -78,30 +82,24 @@ protected:
 
 class OverlayLabel : public OverlayElement
 {
-  friend Overlay;
-  friend OverlayFrame;
-  friend OverlayChildFrame;
-
 public:
   explicit OverlayLabel(const std::string &label)
       : OverlayElement(std::move(label))
   {
   }
 
-  static void registerRender();
+  // static void registerRender();
 
   OverlayElementType getType() const override
   {
     return OverlayElementType::LABEL;
   }
+
+  virtual void render() ;
 };
 
 class OverlayButton : public OverlayElement
 {
-  friend Overlay;
-  friend OverlayFrame;
-  friend OverlayChildFrame;
-
 public:
   OverlayButton(const std::string &label, std::function<void()> actionClick)
       : OverlayElement(std::move(label)), m_actionClick{std::move(actionClick)}
@@ -112,17 +110,14 @@ public:
   {
     return OverlayElementType::BUTTON;
   }
-  static void registerRender();
+  // static void registerRender();
+  virtual void render() ;
 private:
   std::function<void()> m_actionClick{};
 };
 
 class OverlayCheckbox : public OverlayElement
 {
-  friend Overlay;
-  friend OverlayFrame;
-  friend OverlayChildFrame;
-
 public:
   OverlayCheckbox(const std::string &label, std::function<void()> actionOn,
                   std::function<void()> actionOff, bool initVal)
@@ -135,7 +130,8 @@ public:
   {
     return OverlayElementType::CHECKBOX;
   }
-  static void registerRender();
+  // static void registerRender();
+  virtual void render() ;
 private:
   std::function<void()> m_actionOn{};
   std::function<void()> m_actionOff{};
@@ -144,10 +140,6 @@ private:
 
 class OverlayTextbox : public OverlayElement
 {
-  friend Overlay;
-  friend OverlayFrame;
-  friend OverlayChildFrame;
-
 public:
   OverlayTextbox(const std::string &label,
                  std::function<void(const std::string &)> callback)
@@ -159,7 +151,8 @@ public:
   {
     return OverlayElementType::TEXTBOX;
   }
-  static void registerRender();
+  // static void registerRender();
+  virtual void render() ;
 
 private:
   std::string m_text{};
@@ -173,7 +166,8 @@ public:
   {
     return OverlayElementType::SEPARATOR;
   }
-  static void registerRender();
+  // static void registerRender();
+  virtual void render() ;
 };
 
 class OverlayFrameTime : public OverlayElement
@@ -188,7 +182,8 @@ public:
   {
     return OverlayElementType::FRAME_TIME;
   }
-  static void registerRender();
+  // static void registerRender();
+  virtual void render() ;
 };
 
 class OverlayFpsCounter : public OverlayElement
@@ -203,7 +198,8 @@ public:
   {
     return OverlayElementType::FPS_COUNTER;
   }
-  static void registerRender();
+  // static void registerRender();
+  virtual void render() ;
 };
 
 class ContainerInterface
@@ -269,7 +265,7 @@ public:
   {
     return OverlayElementType::FRAME;
   }
-  static void registerRender();
+  // static void registerRender();
 
   void setFramePos(const ImVec2 &pos, ImGuiCond cond)
   {
@@ -301,7 +297,8 @@ public:
   {
     return OverlayElementType::SAMELINE;
   }
-  static void registerRender();
+  // static void registerRender();
+  virtual void render() ;
 };
 
 class OverlayChildFrame : public OverlayElement, public ContainerInterface
@@ -317,12 +314,44 @@ public:
     return OverlayElementType::CHILD_FRAME;
   }
   void render();
-  static void registerRender();
+  // static void registerRender();
 protected:
   ImVec2  m_size = {0,0};
   bool    m_has_boder = false;
   ImGuiWindowFlags m_win_flags ;
 
+};
+
+template <typename T>
+class OverlayCombobox : public OverlayElement
+{
+public:
+  explicit OverlayCombobox(const std::string& name, int32_t curr_idx = 0, const std::vector<  std::pair<T, const char* > >& item_vec  = nullptr, int32_t popup_max_height_in_items = -1)
+  : OverlayElement(std::move(name))
+  , m_max_popup_height(popup_max_height_in_items)
+  , m_curr_idx(curr_idx)
+  {
+      for (int i = 0; i < item_vec.size(); i++)
+      {
+        m_items.push_back(item_vec[i]);
+      }
+  }
+  OverlayElementType getType() const override
+  {
+    return OverlayElementType::COMBOBOX;
+  }
+  virtual void render() 
+  {
+    int item_count = m_items.size();
+    std::vector<const char*> names(item_count);
+    for (int i=0; i<m_items.size(); i++)
+      names[i] = m_items[i].second;
+    ImGui::Combo(m_label.c_str(), &m_curr_idx, names.data(), item_count, m_max_popup_height);
+  }
+protected:
+  std::vector< std::pair<T, const char* > > m_items;
+  int32_t m_max_popup_height;
+  int32_t m_curr_idx = 0;
 };
 
 class Overlay : public ContainerInterface
