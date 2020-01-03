@@ -4,3 +4,6 @@
 [submodule "extern/spdlog"]
 	path = extern/spdlog
 	url = https://github.com/ixlm/spdlog.git
+[submodule "extern/rapidjson"]
+	path = extern/rapidjson
+	url = https://github.com/ixlm/rapidjson.git
