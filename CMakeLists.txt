@@ -16,6 +16,10 @@ else ()
     add_library(RaZ SHARED)
 endif ()
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/RaZ
+)
+
 ##########################
 # RaZ - Useful variables #
 ##########################
