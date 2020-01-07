@@ -29,3 +29,8 @@ if (RAZ_USE_SPDLOG)
     # include(spdlog)
     add_subdirectory(spdlog)
 endif()
+#added by xlm
+option(RAZ_USE_MATHFU "Compile & use mathfu" ON)
+if (RAZ_USE_MATHFU)
+    add_subdirectory(mathfu)
+endif()
