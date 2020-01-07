@@ -7,3 +7,6 @@
 [submodule "extern/rapidjson"]
 	path = extern/rapidjson
 	url = https://github.com/ixlm/rapidjson.git
+[submodule "extern/mathfu"]
+	path = extern/mathfu
+	url = https://github.com/ixlm/mathfu.git
