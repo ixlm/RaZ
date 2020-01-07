@@ -1,5 +1,5 @@
 #include "ConfigManager.h"
-
+#if 0
 ConfigManager *ConfigManager::m_instance = nullptr;
 
 ConfigManager *ConfigManager::createInstance()
@@ -33,3 +33,4 @@ Config *ConfigManager::getDefaultConfig() const
 {
     return m_default_conf;
 }
+#endif
